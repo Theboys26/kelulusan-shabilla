@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumuman Kelulusan | SMPS SHABILLA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-blue: #0A1128;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-blue);
+            /* Islamic modern geometric pattern background */
+            background-image: radial-gradient(circle at 50% 50%, rgba(10, 17, 40, 0.9), rgba(4, 7, 16, 1)), 
+                              url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .title-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            color: #000;
+            transition: all 0.3s ease;
+        }
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(212, 175, 55, 0.7);
+        }
+
+        .btn-gold:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #D4AF37;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .slide-up {
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media print {
+            body { background: white; color: black; }
+            .no-print { display: none !important; }
+            .glass-panel { 
+                background: white; border: 2px solid #000; box-shadow: none; filter: none; 
+                margin: 0; padding: 20px;
+            }
+            .text-gold { color: #000 !important; }
+        }
+
+        .arabesque-border {
+            position: relative;
+        }
+        .arabesque-border::before, .arabesque-border::after {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            border: 2px solid var(--gold);
+        }
+        .arabesque-border::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+        .arabesque-border::after { bottom: 0; right: 0; border-left: none; border-top: none; }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <main class="flex-grow flex items-center justify-center relative w-full max-w-3xl mx-auto">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 w-full relative z-10 arabesque-border">
+            
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <h1 class="title-serif text-3xl sm:text-4xl text-[#D4AF37] mb-2">SMPS SHABILLA</h1>
+                <p class="text-sm sm:text-base text-gray-300 tracking-wider font-light">PENGUMUMAN KELULUSAN SISWA</p>
+                <div class="w-16 h-1 bg-[#D4AF37] mx-auto mt-4 rounded-full opacity-70"></div>
+            </div>
+
+            <!-- Countdown / Timer Block -->
+            <div id="countdownBlock" class="text-center mb-8 hidden">
+                <p class="text-gray-400 mb-2">Pengumuman akan dibuka dalam:</p>
+                <div class="text-2xl sm:text-4xl font-bold text-white tracking-widest font-mono" id="timerDisplay">00:00:00</div>
+            </div>
+
+            <!-- Search Form -->
+            <div id="searchBlock" class="transition-all duration-300 no-print">
+                <form id="searchForm" class="space-y-6">
+                    <div>
+                        <label for="nisn" class="block text-sm font-medium text-gray-300 mb-2">Masukkan NISN / Nomor Peserta</label>
+                        <input type="text" id="nisn" required autocomplete="off"
+                            class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all"
+                            placeholder="Contoh: 0051234567">
+                    </div>
+                    <button type="submit" id="submitBtn" class="w-full btn-gold font-bold py-3 px-4 rounded-xl flex justify-center items-center gap-2">
+                        <span id="btnText">CEK KELULUSAN</span>
+                        <div id="btnLoader" class="loader hidden"></div>
+                    </button>
+                    <p id="spamWarning" class="text-red-400 text-xs text-center hidden mt-2">Mohon tunggu beberapa detik sebelum mencoba lagi.</p>
+                </form>
+            </div>
+
+            <!-- Result Card -->
+            <div id="resultBlock" class="hidden slide-up mt-8 border-t border-white/10 pt-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-xl text-gray-400">Hasil Kelulusan</h2>
+                </div>
+                
+                <div class="space-y-4 text-sm sm:text-base">
+                    <div class="flex flex-col sm:flex-row justify-between pb-2 border-b border-white/10">
+                        <span class="text-gray-400">Nama Lengkap</span>
+                        <span id="resNama" class="font-semibold text-white text-right"></span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-between pb-2 border-b border-white/10">
+                        <span class="text-gray-400">NISN / No. Peserta</span>
+                        <span id="resNisn" class="font-mono text-white text-right"></span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-between pb-2 border-b border-white/10">
+                        <span class="text-gray-400">Kelas</span>
+                        <span id="resKelas" class="text-white text-right"></span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-between pb-2 border-b border-white/10">
+                        <span class="text-gray-400">Keterangan</span>
+                        <span id="resKeterangan" class="text-white text-right"></span>
+                    </div>
+                    
+                    <div class="mt-8 text-center p-6 rounded-2xl bg-white/5 border" id="statusContainer">
+                        <p class="text-sm text-gray-300 mb-2">Status Siswa:</p>
+                        <div id="resStatus" class="text-3xl font-bold tracking-wider title-serif uppercase">LULUS</div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex gap-4 no-print">
+                    <button type="button" onclick="resetForm()" class="flex-1 bg-white/10 hover:bg-white/20 text-white font-medium py-3 px-4 rounded-xl transition border border-white/20">
+                        Kembali
+                    </button>
+                    <button type="button" onclick="window.print()" class="flex-1 btn-gold font-bold py-3 px-4 rounded-xl flex justify-center items-center gap-2">
+                        Cetak Surat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Notification -->
+            <div id="errorBlock" class="hidden slide-up mt-6 bg-red-900/30 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-center no-print">
+                <p id="errorMsg">Data siswa tidak ditemukan. Periksa kembali NISN Anda.</p>
+                <button onclick="resetForm()" class="mt-3 text-sm text-red-300 underline">Coba Lagi</button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-gray-500 text-xs sm:text-sm no-print relative z-10">
+        <p class="font-semibold text-gray-400">SMPS SHABILLA</p>
+        <p>Villa Pesona Asri Blok C7 No 1-7</p>
+    </footer>
+
+    <script>
+        // ==========================================
+        // KONFIGURASI UTAMA (UBAH BAGIAN INI SAJA)
+        // ==========================================
+        
+        // 1. Masukkan URL Web App Google Apps Script di sini
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbx2okHHkWWogzqwFXXe1mSWfWFV499rnnihpQmYNDMQfNuW3NJcj71f1X_udj9vC03Q/exec"; 
+        
+        // 2. Waktu pengumuman dibuka (Format: YYYY-MM-DDTHH:MM:SS)
+        // Contoh: '2026-06-05T10:00:00'
+        const OPENING_DATE = new Date('2026-01-01T00:00:00').getTime(); // Set ke masa lalu agar langsung buka untuk demo
+        
+        // ==========================================
+        // LOGIKA APLIKASI
+        // ==========================================
+
+        const elements = {
+            countdownBlock: document.getElementById('countdownBlock'),
+            timerDisplay: document.getElementById('timerDisplay'),
+            searchBlock: document.getElementById('searchBlock'),
+            searchForm: document.getElementById('searchForm'),
+            nisnInput: document.getElementById('nisn'),
+            submitBtn: document.getElementById('submitBtn'),
+            btnText: document.getElementById('btnText'),
+            btnLoader: document.getElementById('btnLoader'),
+            resultBlock: document.getElementById('resultBlock'),
+            errorBlock: document.getElementById('errorBlock'),
+            errorMsg: document.getElementById('errorMsg'),
+            spamWarning: document.getElementById('spamWarning'),
+            // Result elements
+            resNama: document.getElementById('resNama'),
+            resNisn: document.getElementById('resNisn'),
+            resKelas: document.getElementById('resKelas'),
+            resKeterangan: document.getElementById('resKeterangan'),
+            resStatus: document.getElementById('resStatus'),
+            statusContainer: document.getElementById('statusContainer')
+        };
+
+        let isCooldown = false;
+
+        // Timer Logic
+        function checkTime() {
+            const now = new Date().getTime();
+            const distance = OPENING_DATE - now;
+
+            if (distance > 0) {
+                elements.countdownBlock.classList.remove('hidden');
+                elements.searchBlock.classList.add('hidden');
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                elements.timerDisplay.innerHTML = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if(days > 0) {
+                   elements.timerDisplay.innerHTML = `${days} Hari ` + elements.timerDisplay.innerHTML;
+                }
+            } else {
+                elements.countdownBlock.classList.add('hidden');
+                elements.searchBlock.classList.remove('hidden');
+                clearInterval(timerInterval);
+            }
+        }
+
+        const timerInterval = setInterval(checkTime, 1000);
+        checkTime();
+
+        // Form Submit Logic
+        elements.searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (isCooldown) {
+                elements.spamWarning.classList.remove('hidden');
+                return;
+            }
+
+            const nisn = elements.nisnInput.value.trim();
+            if (!nisn) return;
+
+            if (GAS_URL === "URL_WEB_APP_ANDA_DISINI") {
+                showError("Sistem belum dikonfigurasi. Masukkan URL GAS pada script html.");
+                return;
+            }
+
+            setLoading(true);
+            applyCooldown();
+
+            try {
+                // Fetch data dari GAS
+                const response = await fetch(`${GAS_URL}?action=search&nisn=${encodeURIComponent(nisn)}`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    showResult(result.data);
+                } else {
+                    showError(result.message || "Data siswa tidak ditemukan.");
+                }
+            } catch (error) {
+                showError("Gagal terhubung ke server. Pastikan URL benar atau coba lagi nanti.");
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        function setLoading(isLoading) {
+            elements.nisnInput.disabled = isLoading;
+            elements.submitBtn.disabled = isLoading;
+            if (isLoading) {
+                elements.btnText.classList.add('hidden');
+                elements.btnLoader.classList.remove('hidden');
+                elements.errorBlock.classList.add('hidden');
+            } else {
+                elements.btnText.classList.remove('hidden');
+                elements.btnLoader.classList.add('hidden');
+            }
+        }
+
+        function applyCooldown() {
+            isCooldown = true;
+            setTimeout(() => {
+                isCooldown = false;
+                elements.spamWarning.classList.add('hidden');
+            }, 5000); // 5 Detik cooldown anti-spam
+        }
+
+        function showResult(data) {
+            elements.searchBlock.classList.add('hidden');
+            elements.resultBlock.classList.remove('hidden');
+
+            elements.resNama.textContent = data.nama;
+            elements.resNisn.textContent = data.nisn;
+            elements.resKelas.textContent = data.kelas;
+            elements.resKeterangan.textContent = data.keterangan || "-";
+            elements.resStatus.textContent = data.status.toUpperCase();
+
+            const status = data.status.toLowerCase();
+            
+            if (status.includes('lulus') && !status.includes('tidak')) {
+                // LULUS STYLE
+                elements.statusContainer.className = "mt-8 text-center p-6 rounded-2xl bg-green-500/20 border border-green-500/50";
+                elements.resStatus.className = "text-3xl sm:text-4xl font-bold tracking-wider title-serif uppercase text-green-400";
+                
+                // Trigger Confetti
+                triggerConfetti();
+                
+            } else {
+                // TIDAK LULUS STYLE
+                elements.statusContainer.className = "mt-8 text-center p-6 rounded-2xl bg-red-500/20 border border-red-500/50";
+                elements.resStatus.className = "text-3xl sm:text-4xl font-bold tracking-wider title-serif uppercase text-red-400";
+            }
+        }
+
+        function showError(message) {
+            elements.errorBlock.classList.remove('hidden');
+            elements.errorMsg.textContent = message;
+            elements.searchBlock.classList.add('hidden');
+        }
+
+        function resetForm() {
+            elements.resultBlock.classList.add('hidden');
+            elements.errorBlock.classList.add('hidden');
+            elements.searchBlock.classList.remove('hidden');
+            elements.nisnInput.value = '';
+            elements.nisnInput.focus();
+        }
+
+        function triggerConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              var particleCount = 50 * (timeLeft / duration);
+              confetti(Object.assign({}, defaults, { particleCount,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                colors: ['#D4AF37', '#ffffff', '#0A1128'] // Gold, white, dark blue
+              }));
+              confetti(Object.assign({}, defaults, { particleCount,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                colors: ['#D4AF37', '#ffffff', '#0A1128']
+              }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
